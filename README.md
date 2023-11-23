@@ -17,5 +17,5 @@ In this study, the benchmark dataset was sourced from MNDR v4.0\cite{ning2021mnd
 
 # Run the demo
 ```
-python main.py
+cd code && python main.py
 ```
