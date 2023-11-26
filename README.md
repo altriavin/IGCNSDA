@@ -15,6 +15,15 @@ scipy 1.7.3
 # Dataset
 In this study, the benchmark dataset was sourced from MNDR v4.0\cite{ning2021mndr}, a comprehensive repository that aggregates experimentally validated and predicted ncRNA-disease associations extracted from literature and other reputable resources. The original snoRNA-disease associations were extracted by querying the snoRNA records within MNDR dataset. Subsequently, entries with redundant or incomplete information were meticulously eliminated, resulting in the curation of a benchmark dataset consisting of 471 snoRNAs, 84 diseases, and a total of 1106 well-documented associations between these entities. Moreover, we collect 584 pairs of associations between 82 diseases and 13 snoRNAs were extracted from the ncRPheo dataset for independent testing.
 
+# Project structure
+```
+code/dataloader.py & code/utils.py: Data processing related code
+code/model.py: model related code
+code/main.py: main function
+data/indepent: indepent test dataset
+data/RNADisease: RNADisease v4.0 dataset
+```
+
 # Run the demo
 ```
 cd code && python main.py

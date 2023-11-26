@@ -9,18 +9,21 @@ import numpy as np
 import time
 from tqdm import tqdm
 
-dataset = GetData(path="../data/indepent")
+# choose the data path
+dataset = GetData(path="../data/RNADisease")
 device = torch.device('cuda:1' if torch.cuda.is_available() else "cpu")
 latent_dim = 256
 n_layers = 3
 lr = 0.001
 
+# define the model
 model = IGCNSDA(dataset, latent_dim=latent_dim, n_layers=n_layers, groups=3, dropout_bool=False, l2_w=0.0002, single=True).to(device)
 optimiser = torch.optim.Adam(model.parameters(), lr=lr)
 
 EPOCHS = 100
 BATCH_SIZE = 1024
 
+# train the model
 def run_train(dataset, model, optimiser):
     model.train()
     num_batches = dataset.trainSize // BATCH_SIZE + 1
@@ -42,6 +45,7 @@ def run_train(dataset, model, optimiser):
 
     return f"Final train loss: {mean_batch_loss/num_batches:.7f}"
 
+# main function
 def main():
     for epoch in range(1,EPOCHS+1):
         train_info = run_train(dataset, model, optimiser)

@@ -5,11 +5,12 @@ import torch.nn.functional as F
 import numpy as np
 from utils import cust_mul
 
+# the basebone network -- LightGCN
 class LightGCN(nn.Module):
-    def __init__(self,  
+    def __init__(self,
                  dataset: GetData,
-                 latent_dim=200, 
-                 n_layers=3, 
+                 latent_dim=200,
+                 n_layers=3,
                  keep_prob=0.8,
                  dropout_bool=False,
                  l2_w=1e-4):
@@ -44,22 +45,22 @@ class LightGCN(nn.Module):
         values = values[random_index]/keep_prob
         g = torch.sparse.FloatTensor(index.t(), values, size)
         return g
-    
+
     def __dropout(self, keep_prob):
         graph = self.__dropout_x(self.Graph, keep_prob)
         return graph
-    
 
-    def computer(self):    
+
+    def computer(self):
         snoRNAs_emb = self.embedding_snoRNA.weight
         diseases_emb = self.embedding_disease.weight
         all_emb = torch.cat([snoRNAs_emb, diseases_emb])
-        
+
         if self.dropout_bool and self.training:
-            g_droped = self.__dropout(self.keep_prob)     
+            g_droped = self.__dropout(self.keep_prob)
         else:
             g_droped = self.Graph
-        
+
         all_emb_list = [all_emb]
         for layer in range(self.n_layers):
             all_emb = torch.sparse.mm(g_droped, all_emb)
@@ -69,14 +70,14 @@ class LightGCN(nn.Module):
         #all_emb = all_emb_list[-1]
         snoRNAs, diseases = torch.split(all_emb, [self.num_snoRNAs, self.num_diseases])
         return snoRNAs, diseases
-    
+
     def getSnoRNAsRating(self, snoRNAs):
         all_snoRNAs, all_diseases = self.computer()
         snoRNAs_emb = all_snoRNAs[snoRNAs.long()]
         diseases_emb = all_diseases
         rating = self.f(torch.matmul(snoRNAs_emb, diseases_emb.t()))
         return rating
-    
+
     def getEmbedding(self, snoRNAs, pos_diseases, neg_diseases):
         all_snoRNAs, all_diseases = self.computer()
         snoRNAs_emb = all_snoRNAs[snoRNAs]
@@ -86,22 +87,22 @@ class LightGCN(nn.Module):
         pos_emb_ego = self.embedding_disease(pos_diseases)
         neg_emb_ego = self.embedding_disease(neg_diseases)
         return snoRNAs_emb, pos_emb, neg_emb, snoRNAs_emb_ego, pos_emb_ego, neg_emb_ego
-    
+
     def bpr_loss(self, snoRNAs, pos, neg):
-        (snoRNAs_emb, pos_emb, neg_emb, 
+        (snoRNAs_emb, pos_emb, neg_emb,
         snoRNAEmb0,  posEmb0, negEmb0) = self.getEmbedding(snoRNAs.long(), pos.long(), neg.long())
-        reg_loss = (1/2)*(snoRNAEmb0.norm(2).pow(2) + 
+        reg_loss = (1/2)*(snoRNAEmb0.norm(2).pow(2) +
                          posEmb0.norm(2).pow(2)  +
                          negEmb0.norm(2).pow(2))/float(len(snoRNAs))
         pos_scores = torch.mul(snoRNAs_emb, pos_emb)
         pos_scores = torch.sum(pos_scores, dim=1)
         neg_scores = torch.mul(snoRNAs_emb, neg_emb)
         neg_scores = torch.sum(neg_scores, dim=1)
-        
+
         loss = torch.mean(F.softplus(neg_scores - pos_scores))
-        
+
         return loss + self.l2_w * reg_loss
-       
+
     def forward(self, snoRNAs, diseases):
         all_snoRNAs, all_diseases = self.computer()
         snoRNAs_emb = all_snoRNAs[snoRNAs]
@@ -110,12 +111,12 @@ class LightGCN(nn.Module):
         gamma     = torch.sum(inner_pro, dim=1)
         return gamma
 
-
+# IGCNSDA model
 class IGCNSDA(nn.Module):
-    def __init__(self,  
+    def __init__(self,
                  dataset: GetData,
-                 latent_dim=200, 
-                 n_layers=6, 
+                 latent_dim=200,
+                 n_layers=6,
                  keep_prob=0.9,
                  groups=4,
                  device=torch.device('cuda:1' if torch.cuda.is_available() else "cpu"),
@@ -158,25 +159,25 @@ class IGCNSDA(nn.Module):
         values = values[random_index]/keep_prob
         g = torch.sparse.FloatTensor(index.t(), values, size)
         return g
-    
+
     def __dropout(self, keep_prob):
         graph = self.__dropout_x(self.Graph, keep_prob)
         return graph
-    
 
-    def computer(self):    
+
+    def computer(self):
         snoRNAs_emb = self.embedding_snoRNA.weight
         diseases_emb = self.embedding_disease.weight
         all_emb = torch.cat([snoRNAs_emb, diseases_emb])
-        
+
         if self.dropout_bool and self.training:
-            g_droped = self.__dropout(self.keep_prob)     
+            g_droped = self.__dropout(self.keep_prob)
         else:
             g_droped = self.Graph
-        
+
         ego_embed = all_emb
         side_embed = torch.sparse.mm(g_droped, all_emb)
-        
+
         temp = self.dropout(self.leaky(self.fc(ego_embed + side_embed)))
         group_scores = self.dropout(self.fc_g(temp))
 
@@ -196,14 +197,14 @@ class IGCNSDA(nn.Module):
         all_emb_list = [[None for _ in range(self.groups)] for _ in range(self.n_layers)]
         for g in range(0,self.groups):
             all_emb_list[0][g] = ego_embed
-        
+
         for k in range(1,self.n_layers):
             for g in range(self.groups):
                 all_emb_list[k][g] = torch.sparse.mm(subgraph_list[g], all_emb_list[k-1][g])
 
-        
+
         all_emb_list = [torch.sum(torch.stack(x),0) for x in all_emb_list]
-        
+
         if self.single:
             all_emb = all_emb_list[-1]
         else:
@@ -213,14 +214,14 @@ class IGCNSDA(nn.Module):
 
         snoRNAs, diseases = torch.split(all_emb, [self.num_snoRNAs, self.num_diseases])
         return snoRNAs, diseases
-    
+
     def getSnoRNAsRating(self, snoRNAs):
         all_snoRNAs, all_diseases = self.computer()
         snoRNAs_emb = all_snoRNAs[snoRNAs.long()]
         diseases_emb = all_diseases
         rating = self.f(torch.matmul(snoRNAs_emb, diseases_emb.t()))
         return rating
-    
+
     def getEmbedding(self, snoRNAs, pos_diseases, neg_diseases):
         all_snoRNAs, all_diseases = self.computer()
         snoRNAs_emb = all_snoRNAs[snoRNAs]
@@ -230,22 +231,22 @@ class IGCNSDA(nn.Module):
         pos_emb_ego = self.embedding_disease(pos_diseases)
         neg_emb_ego = self.embedding_disease(neg_diseases)
         return snoRNAs_emb, pos_emb, neg_emb, snoRNAs_emb_ego, pos_emb_ego, neg_emb_ego
-    
+
     def bpr_loss(self, snoRNAs, pos, neg):
-        (snoRNAs_emb, pos_emb, neg_emb, 
+        (snoRNAs_emb, pos_emb, neg_emb,
         snoRNAEmb0,  posEmb0, negEmb0) = self.getEmbedding(snoRNAs.long(), pos.long(), neg.long())
-        reg_loss = (1/2)*(snoRNAEmb0.norm(2).pow(2) + 
+        reg_loss = (1/2)*(snoRNAEmb0.norm(2).pow(2) +
                          posEmb0.norm(2).pow(2)  +
                          negEmb0.norm(2).pow(2))/float(len(snoRNAs))
         pos_scores = torch.mul(snoRNAs_emb, pos_emb)
         pos_scores = torch.sum(pos_scores, dim=1)
         neg_scores = torch.mul(snoRNAs_emb, neg_emb)
         neg_scores = torch.sum(neg_scores, dim=1)
-        
+
         loss = torch.mean(F.softplus(neg_scores - pos_scores))
-        
+
         return loss + self.l2_w * reg_loss
-       
+
     def forward(self, snoRNAs, diseases):
         all_snoRNAs, all_diseases = self.computer()
         snoRNAs_emb = all_snoRNAs[snoRNAs]
