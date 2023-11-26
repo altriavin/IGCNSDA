@@ -1,0 +1,85 @@
+disease,id
+Gastric Cancer,0
+Glioblastoma,1
+Adult Acute Myeloid Leukemia,2
+Cerebral Cavernous Malformation,3
+Hepatocellular Carcinoma,4
+Dysregulated Immunity,5
+High Grade Dysplastic Nodule,6
+Liver Cirrhosis,7
+Low Grade Dysplastic Nodule,8
+Anaphylaxis,9
+Intracranial Aneurysm,10
+Lung Cancer,11
+Bladder Cancer,12
+Multiple Sclerosis,13
+Gastric Carcinoma,14
+Colorectal Cancer,15
+Hepatitis C,16
+Esophageal Cancer,17
+Cancer,18
+Diffuse Large B-Cell Lymphoma,19
+Lung Adenocarcinoma,20
+Pancreatic Ductal Adenocarcinoma,21
+COVID-19,22
+Bronchopulmonary Dysplasia,23
+Alzheimer Disease,24
+Hyperlipidemia,25
+Early Hepatocellular Carcinoma,26
+Breast Cancer,27
+Prostate Cancer,28
+Colon Adenocarcinoma,29
+Autism Spectrum Disorder,30
+Sarcoma,31
+West Nile Virus Infection,32
+Oral Squamous Cell Carcinoma,33
+Ovarian Cancer,34
+Non-Small Cell Lung Cancer,35
+Clear Cell Renal Cell Carcinoma,36
+Traumatic Brain Injury,37
+Uterine Leiomyoma,38
+Bladder Carcinoma,39
+B-Cell Lymphoma,40
+Prostate Neoplasm,41
+Osteoporosis,42
+Papillary Thyroid Carcinoma,43
+Glioma,44
+Acute Myeloid Leukemia,45
+Chronic Lymphocytic Leukemia,46
+Lung Carcinoma,47
+Lung Non-Small Cell Carcinoma,48
+Rheumatoid Arthritis,49
+Adenocarcinoma,50
+Systemic Lupus Erythematosus,51
+Prader-Willi Syndrome,52
+Colon Cancer,53
+Osteosarcoma,54
+Cervical Cancer,55
+Canine Oral Melanoma,56
+Melanoma,57
+Head And Neck Squamous Cell Carcinoma,58
+Fetal Growth Restriction,59
+Malignant Pleural Mesothelioma,60
+Cartilage Disease,61
+Astrocytoma,62
+Wart,63
+Malignant Glioma,64
+Epstein-Barr Virus Infection,65
+Canine Mast Cell Tumours,66
+Acute Promyelocytic Leukemia,67
+Heart Failure,68
+Ameloblastoma,69
+Tuberculosis,70
+Pancreatic Cancer,71
+Psoriatic Arthritis,72
+HHV-6B,73
+Diabetic Peripheral Neuropathy,74
+Bone Cancer Pain,75
+Hypertension,76
+Osteoarthritis,77
+Diffuse Intrinsic Pontine Glioma,78
+Primary Ovarian Insufficiency,79
+Cardiovascular Disease,80
+Malaria,81
+Endothelial Cell Inflammation,82
+Prostate Carcinoma,83

@@ -12,14 +12,12 @@ ALL_TRAIN = False
 
 class GetData(Dataset):
 
-    def __init__(self, path="../data/MNDR"):
+    def __init__(self, path="../data/RNADisease"):
         # train or test
         print(f'using {path} dataset')
         self.device = torch.device('cuda:1' if torch.cuda.is_available() else "cpu")
 
         print(f'loading [{path}]')
-        self.mode_dict = {'train': 0, "test": 1}
-        self.mode = self.mode_dict['train']
         train_file = path + '/train.txt'
         test_file = path + '/test.txt'
         self.path = path
@@ -48,17 +46,17 @@ class GetData(Dataset):
             self.trainSnoRNA = np.concatenate((self.trainSnoRNA, self.testSnoRNA), axis=0)
             self.trainDisease = np.concatenate((self.trainDisease, self.testDisease), axis=0)
             self.trainSize = self.trainSize + self.testSize
-        
+
         self.Graph = None
         print(f"{self.trainSize} interactions for training")
         print(f"{self.testSize} interactions for testing")
         print(f"Sparsity : {(self.trainSize + self.testSize) / self.n_snoRNA / self.m_disease}")
 
         # (snoRNAs,diseases), bipartite graph
-        self.SnoRNADiseaseNet = csr_matrix((np.ones(len(self.trainSnoRNA)), 
+        self.SnoRNADiseaseNet = csr_matrix((np.ones(len(self.trainSnoRNA)),
                                         (self.trainSnoRNA, self.trainDisease)),
                                         shape=(self.n_snoRNA, self.m_disease))
-        
+
 
         # pre-calculate
         self.allPos = self.getSnoRNAPosDiseases(list(range(self.n_snoRNA)))
@@ -72,9 +70,9 @@ class GetData(Dataset):
         index = torch.stack([row, col])
         data = torch.FloatTensor(coo.data)
         return torch.sparse.FloatTensor(index, data, torch.Size(coo.shape))
-        
+
     def saveRatingMatrix(self):
-        test_ratings = csr_matrix((np.ones(len(self.testSnoRNA)), 
+        test_ratings = csr_matrix((np.ones(len(self.testSnoRNA)),
                                         (self.testSnoRNA, self.testDisease)),
                                         shape=(self.n_snoRNA, self.m_disease))
         sp.save_npz(self.path + '/train_mat.npz', self.SnoRNADiseaseNet)
@@ -97,19 +95,19 @@ class GetData(Dataset):
                 adj_mat[:self.n_snoRNA, self.n_snoRNA:] = R
                 adj_mat[self.n_snoRNA:, :self.n_snoRNA] = R.T
                 adj_mat = adj_mat.todok()
-                
+
                 rowsum = np.array(adj_mat.sum(axis=1))
                 d_inv = np.power(rowsum, -0.5).flatten()
                 d_inv[np.isinf(d_inv)] = 0.
                 d_mat = sp.diags(d_inv)
-                
+
                 norm_adj = d_mat.dot(adj_mat)
                 norm_adj = norm_adj.dot(d_mat)
                 norm_adj = norm_adj.tocsr()
                 end = time()
                 print(f"costing {end-s}s, saved norm_mat...")
                 sp.save_npz(self.path + '/s_pre_adj_mat.npz', norm_adj)
-                
+
 
             self.Graph = self._convert_sp_mat_to_sp_tensor(norm_adj)
             self.Graph = self.Graph.coalesce().to(self.device)

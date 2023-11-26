@@ -9,7 +9,7 @@ import numpy as np
 import time
 from tqdm import tqdm
 
-dataset = GetData(path="../data/MNDR")
+dataset = GetData(path="../data/indepent")
 device = torch.device('cuda:1' if torch.cuda.is_available() else "cpu")
 latent_dim = 256
 n_layers = 3
@@ -50,4 +50,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    

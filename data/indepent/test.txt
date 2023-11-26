@@ -1,4 +1,4 @@
-snoRNA_id,disease_id,ass
+snoRNA_id,disease_id,rating
 2,35,1
 2,4,1
 1,55,1
