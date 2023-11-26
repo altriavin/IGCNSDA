@@ -1,4 +1,4 @@
-# IGCNSDA: a interpretable graph convolutional network approach for predicting potential snoRNA-disease associations
+# IGCNSDA: Unraveling Disease-Associated snoRNAs with an Interpretable Graph Convolutional Network
 
 The IGCNSDA utilizes an interpretable graph convolutional network approach to predict potential snoRNA-disease associations. Initially, we apply a graph convolutional network algorithm on the bipartite graph representing snoRNA-disease associations to obtain first-order embeddings. We introduce a novel subgraph generation algorithm that clusters similar snoRNAs into subgraphs. Subsequently, we iteratively apply the Graph Convolutional Network (GCN) on each subgraph to update the embeddings of snoRNAs and diseases, yielding higher-order embeddings. Finally, a layer aggregation algorithm is employed to derive the ultimate embeddings for snoRNAs and diseases.
 
